@@ -120,7 +120,7 @@ def similarity_search(
         cursor.execute(
             """
             SELECT id, title, content, source, chunk_index, metadata,
-                   1 - (embedding <=> %s) AS score
+                   1 - (embedding <=> %s::vector) AS score
             FROM documents
             WHERE collection_name = %s
               AND embedding_provider = 'ollama'
