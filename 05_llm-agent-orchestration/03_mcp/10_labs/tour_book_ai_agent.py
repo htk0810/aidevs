@@ -45,13 +45,11 @@ load_dotenv(COURSE_ROOT / ".env")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 MAX_AGENT_ROUNDS = 8
 QUESTION = (
-    "부산의 현재 날씨와 내일 예보를 확인하고, 15만 원 이하 호텔을 찾은 뒤 "
-    "검색된 호텔의 취소 규정을 알려줘."
+    "hotel-seoul-001에 9월1일부터 3일간 예약 하려고해 인원은 4명이야."
 )
 INSTRUCTIONS = (
-    "당신은 여행 계획 도우미입니다. 질문을 완전히 해결하는 데 필요한 Tool을 "
-    "한 단계씩 사용하세요. 호텔 취소 규정은 반드시 먼저 호텔을 검색하여 얻은 "
-    "hotel_id로 조회하세요. Tool 결과만 근거로 한국어 최종 답변을 작성하세요."
+    "당신은 예약 도우미입니다. 질문을 완전히 해결하는 데 필요한 Tool을 사용합니다."
+    "hotel_id를 사용해야 합니다. Tool 호출은 한 번에 하나씩만 수행할 수 있습니다. "
 )
 
 
