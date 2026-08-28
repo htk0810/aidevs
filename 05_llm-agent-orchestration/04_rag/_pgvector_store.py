@@ -126,9 +126,9 @@ def similarity_search(
               AND embedding_provider = 'ollama'
               AND embedding_model = %s
               AND embedding_dimension = %s
-              AND (%s::double precision IS NULL OR 1 - (embedding <=> %s) >= %s)
+              AND (%s::double precision IS NULL OR 1 - (embedding <=> %s::vector) >= %s)
               AND (%s::jsonb = '{}'::jsonb OR metadata @> %s::jsonb)
-            ORDER BY embedding <=> %s
+            ORDER BY embedding <=> %s::vector
             LIMIT %s
             """,
             (
