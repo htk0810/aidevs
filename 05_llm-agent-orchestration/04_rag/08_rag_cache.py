@@ -6,7 +6,7 @@ from _redis_cache import JsonCache, cache_key
 
 
 CACHE_NAMESPACE = "simple-rag-answer:v1"
-QUESTION = "호텔을 당일 취소하면 환불받을 수 있나요?"
+QUESTION = "아기가 첫 이가 나면 언제 치과에 가야하나요?"
 
 
 def ask(question: str, cache: JsonCache) -> dict:

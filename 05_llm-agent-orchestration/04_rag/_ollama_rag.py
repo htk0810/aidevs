@@ -7,7 +7,7 @@ import httpx
 from _pgvector_store import OLLAMA_BASE_URL, similarity_search
 
 
-COLLECTION = "rag_lesson"
+COLLECTION = "infant_oral_care"
 CHAT_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
 
 
