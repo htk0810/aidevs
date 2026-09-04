@@ -1,69 +1,117 @@
 # 08 Agent Evaluation and Tracing
 
-Agent가 **실행되는 것**과 **올바르게 행동하는 것**은 다릅니다. 작은 테스트 시나리오로 행동을 확인하고, 실패하면 Trace에서 원인을 찾습니다.
-
-## 학습 목표
-
-- 입력과 기대 행동을 한 쌍으로 기록합니다.
-- 기대 Tool·상태와 실제 결과를 규칙으로 비교합니다.
-- 정상뿐 아니라 정보 부족·정책 위반 시나리오도 평가합니다.
-- Trace에서 처음 실패한 Node와 원인을 찾습니다.
-- 코드 수정 뒤 이전 기능이 깨지지 않았는지 회귀 테스트합니다.
-- 선택 실습으로 GPT·Gemini·Ollama의 결과와 지연 시간을 비교합니다.
-
-## 학습 순서
-
-| 메뉴 | 파일 | 핵심 내용 |
-|---|---|---|
-| 8-1 | `01_why_evaluate.py` | 실행 성공과 올바른 행동의 차이 |
-| 8-2 | `02_one_scenario.py` | 첫 평가 시나리오 |
-| 8-3 | `03_multiple_scenarios.py` | 여러 시나리오와 통과율 |
-| 8-4 | `04_trace_failure.py` | Trace에서 실패 위치 찾기 |
-| 8-5 | `05_regression.py` | 수정 전후 회귀 확인 |
-| 8-6 | `06_provider_comparison_optional.py` | Provider 비교 선택 확장 |
-
-## 실행
-
-```powershell
-python .\01_why_evaluate.py
-python .\02_one_scenario.py
-python .\03_multiple_scenarios.py
-python .\04_trace_failure.py
-python .\05_regression.py
-```
-
-8-1~8-5는 외부 API 없이 실행됩니다. 8-6은 Backend를 먼저 실행하고 Provider 환경 변수를 설정한 경우에만 진행합니다.
-
-```powershell
-python .\06_provider_comparison_optional.py
-```
-
-## 처음 평가할 항목
-
-| 항목 | 질문 |
-|---|---|
-| Tool | 필요한 Tool만 선택했는가? |
-| Status | 완료·정보 부족·차단 상태가 맞는가? |
-| Arguments | 날짜·지역·인원이 정확한가? |
-| Grounding | 필요한 답변에 근거가 있는가? |
-| Safety | 승인 없는 변경을 차단했는가? |
-| Termination | 정해진 횟수 안에 종료했는가? |
-
-처음에는 Tool과 Status 두 항목만 평가하고, 앞 과정의 RAG·Memory·Safety 시나리오를 한 가지씩 추가합니다.
-
-## Trace는 로그와 무엇이 다른가
-
-단순 오류 문장만 남기는 대신 다음 정보를 실행 단계별로 기록합니다.
+이 장에서는 새 Agent나 평가용 애플리케이션을 만들지 않습니다. `mini_agent_st`에서 이미 만든 06과 07 Agent를 실제로 실행하고 결과를 검사합니다.
 
 ```text
-trace_id · node · tool · status · duration_ms · iteration · error
+01 Mini Agent 06 Live 평가
+02 Mini Agent 07 Live 평가
 ```
 
-Trace의 목적은 점수를 예쁘게 만드는 것이 아니라 **어디서 처음 잘못되었는지 찾는 것**입니다.
+Scenario JSON, 저장 Fixture와 전체 회귀 Suite는 지금 추가하지 않습니다. 두 Live 평가를 먼저 이해한 뒤 필요할 때 확장합니다.
 
-## 이번 단계의 범위
+각 파일의 맨 위에는 `SCENARIO`가 있습니다.
 
-- 규칙 기반 평가는 필수입니다.
-- LLM Judge, 외부 평가 플랫폼, 복잡한 가중치는 다루지 않습니다.
-- Provider 비교는 선택 실습이며 실제 호출 비용과 시간이 발생할 수 있습니다.
-- API Key, 전체 Prompt, 개인정보는 평가 보고서에 저장하지 않습니다.
+```text
+SCENARIO
+├─ name: 시험 이름
+├─ input: Agent에게 보낼 실제 입력
+└─ expected: 기대 상태와 행동
+```
+
+따라서 한 파일을 위에서 아래로 읽으면 `Scenario 선언 → Live API 호출 → 실제 결과 → 기대값 비교 → PASS/FAIL` 전체가 보입니다.
+
+## 1. Mini Agent 06 Live 평가
+
+### 평가할 행동
+
+```text
+질문: 제주 날씨를 확인하고 비가 오면 실내 관광지를 추천해줘
+
+기대 실행:
+get_weather → search_indoor_places → 최종 답변
+```
+
+평가 파일의 `SCENARIO`에 질문과 기대값을 선언합니다. 실제 Backend의 `/api/agents/run`을 호출하고 다음 세 가지를 검사합니다.
+
+- `status == completed`
+- `termination_reason == model_finished`
+- 실행된 Tool 순서가 `get_weather → search_indoor_places`
+
+### 실행
+
+터미널 1에서 Mini Agent 06 MCP Server를 실행합니다.
+
+```powershell
+cd C:\mini_agent_st\mini_agent_06_agent_workflow
+python .\mcp_server\business_tools_server.py
+```
+
+터미널 2에서 Backend를 실행합니다.
+
+```powershell
+cd C:\mini_agent_st\mini_agent_06_agent_workflow
+uvicorn app.main:app --reload --port 8000 --app-dir backend
+```
+
+터미널 3에서 평가합니다.
+
+```powershell
+cd C:\aidevs\05_llm-agent-orchestration\08_agent-evaluation-and-tracing
+python .\01_evaluate_live_agent_06.py
+```
+
+## 2. Mini Agent 07 Live 평가
+
+07의 `SCENARIO`에는 입력, 승인 결정, 승인 전 기대값과 승인 후 기대값이 함께 있습니다. 승인이 필요하므로 두 단계로 평가합니다.
+
+```text
+Agent 실행
+→ waiting_approval 확인
+→ 승인 전 place_order 실행 0회 확인
+→ 실제 승인 API 호출
+→ completed 확인
+→ place_order 실행 1회 확인
+```
+
+### 실행
+
+06 서버를 종료한 뒤 터미널 1에서 Mini Agent 07 MCP Server를 실행합니다.
+
+```powershell
+cd C:\mini_agent_st\mini_agent_07_human_approval
+python .\mcp_server\order_tools_server.py
+```
+
+터미널 2에서 Backend를 실행합니다.
+
+```powershell
+cd C:\mini_agent_st\mini_agent_07_human_approval
+uvicorn app.main:app --reload --port 8000 --app-dir backend
+```
+
+터미널 3에서 평가합니다.
+
+```powershell
+cd C:\aidevs\05_llm-agent-orchestration\08_agent-evaluation-and-tracing
+python .\02_evaluate_live_agent_07.py
+```
+
+이 평가는 실제 주문을 생성하므로 Mini Agent 07의 교육용 Mock 주문 환경에서만 실행합니다.
+
+## 환경 변수
+
+Backend 주소가 다르면 환경 변수로 변경할 수 있습니다.
+
+```powershell
+$env:MINI_AGENT_06_API_URL = "http://127.0.0.1:8000/api/agents/run"
+$env:MINI_AGENT_07_API_URL = "http://127.0.0.1:8000/api/agents"
+```
+
+## 파일 구성
+
+| 파일 | 역할 |
+| --- | --- |
+| `01_evaluate_live_agent_06.py` | Mini Agent 06의 Tool 선택·순서·종료 평가 |
+| `02_evaluate_live_agent_07.py` | Mini Agent 07의 승인 전·후 안전 평가 |
+
+다음 단계가 필요해지면 실패 Trace 분석, 저장 Fixture, 여러 Scenario와 회귀 평가를 하나씩 추가합니다.
