@@ -27,8 +27,9 @@ Orchestration은 아직 넣지 않습니다. 현재 수업 PC에는 PostgreSQL·
 ```
 
 ```powershell
-cd C:\aidevs\07_multi-agent-service-ops\00_runtime-and-deployment\01_simple-multi-llm-compose
-Copy-Item .env.example .env
+cd C:\aidevs\07_multi-agent-service-ops\00_runtime-and-deployment\01_simple-multi-llm-compose2
+Copy-Item backend\.env.example backend\.env
+Copy-Item frontend\.env.example frontend\.env
 docker compose config --quiet
 docker compose up --build -d
 docker compose ps
@@ -45,7 +46,7 @@ OLLAMA_BASE_URL=http://host.docker.internal:11434
 
 ### 코드·환경 설정을 수정한 뒤 반영하기
 
-`backend/`, `frontend/`, `compose.yml`, 또는 `.env`를 수정해도 이미 실행 중인
+`backend/`, `frontend/`, `compose.yml`, `backend/.env`, 또는 `frontend/.env`를 수정해도 이미 실행 중인
 Container는 자동으로 바뀌지 않습니다. 예를 들어 `GEMMA_MODEL=gemma3:4b`로 바꾼 뒤에는
 아래 명령으로 Backend와 Frontend Image를 다시 빌드하고 Container를 새로 만듭니다.
 
@@ -103,7 +104,7 @@ Full Stack 방식은 새 PostgreSQL Volume을 만들 때 `database/init.sql`을 
 
 ## 3. 실제 LLM 설정
 
-`.env`에 OpenAI 또는 Gemini Key를 입력합니다.
+`backend/.env`에 OpenAI 또는 Gemini Key를 입력합니다.
 
 ```ini
 OPENAI_API_KEY=
@@ -188,8 +189,9 @@ Full Stack 방식에서는 이 폴더의 `redis_data`, `postgres_data`, `ollama_
 
 ## 6. 만든 이미지를 다른 PC에 전달하기
 
-수강생 또는 다른 개발자에게 전달할 때는 실제 `.env` 파일을 포함하지 않습니다. API Key가
-들어갈 수 있으므로 `.env.example`만 전달하고, 받는 사람이 자신의 `.env`를 만들게 합니다.
+수강생 또는 다른 개발자에게 전달할 때는 실제 `backend/.env`, `frontend/.env` 파일을
+포함하지 않습니다. API Key가 들어갈 수 있으므로 각 `.env.example`만 전달하고, 받는 사람이
+자신의 `.env`를 만들게 합니다.
 Ollama Model도 Backend·Frontend Image와 별개이므로 실행 후 별도로 준비해야 합니다.
 
 ### Container Registry로 배포하기
@@ -242,24 +244,29 @@ Host Port는 아래와 같아야 합니다.
 
 #### 3. 수신자: 배포 Image를 받아 Application 실행하기
 
-운영자가 전달한 `compose.release.yml`과 `.env.example`을 같은 폴더에 둡니다. `.env`를
-만들고 Image 주소를 실제 Docker Hub 사용자명과 버전으로 바꿉니다.
+운영자가 전달한 `compose.release.yml`, `backend/.env.example`, `frontend/.env.example`을
+같은 폴더에 둡니다. 각 `.env`를 만들고 Image 주소를 실제 Docker Hub 사용자명과 버전으로
+바꿉니다.
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item backend\.env.example backend\.env
+Copy-Item frontend\.env.example frontend\.env
 ```
 
 ```ini
+# backend/.env
 BACKEND_IMAGE=<DOCKER_HUB_ID>/simple-multi-llm-backend:1.0.0
+
+# frontend/.env
 FRONTEND_IMAGE=<DOCKER_HUB_ID>/simple-multi-llm-frontend:1.0.0
 ```
 
 그 다음 `pull`로 Image를 받고, `up`으로 Backend·Frontend Container를 실행합니다.
 
 ```powershell
-docker compose -f .\compose.release.yml pull
-docker compose -f .\compose.release.yml up -d
-docker compose -f .\compose.release.yml ps
+docker compose --env-file .\backend\.env --env-file .\frontend\.env -f .\compose.release.yml pull
+docker compose --env-file .\backend\.env --env-file .\frontend\.env -f .\compose.release.yml up -d
+docker compose --env-file .\backend\.env --env-file .\frontend\.env -f .\compose.release.yml ps
 ```
 
 `compose.release.yml`에는 다음이 미리 설정되어 있습니다.

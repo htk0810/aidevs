@@ -6,8 +6,8 @@
 `simple_multi_llm` 전용 Schema와 Table을 준비합니다.
 
 기존 Schema나 데이터를 삭제하지 않으며 `CREATE ... IF NOT EXISTS`만 실행합니다.
-연결·인증·SQL 오류는 성공으로 숨기지 않습니다. `.env`에 HOST_DATABASE_URL이 없으면
-Container용 DATABASE_URL의 `host.docker.internal`을 Host용 `127.0.0.1`로 바꿉니다.
+연결·인증·SQL 오류는 성공으로 숨기지 않습니다. `backend/.env`의 DATABASE_URL은
+Host에서 연결할 수 있도록 `host.docker.internal`을 `127.0.0.1`로 바꿉니다.
 """
 
 import os
@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 
 ROOT = Path(__file__).resolve().parent
-ENV_PATH = ROOT / ".env"
+ENV_PATH = ROOT / "backend" / ".env"
 SQL_PATH = ROOT / "database" / "init.sql"
 DEFAULT_HOST_DATABASE_URL = (
     "postgresql://agent_user:agent_pwd@127.0.0.1:5433/agent_db"
@@ -27,10 +27,6 @@ DEFAULT_HOST_DATABASE_URL = (
 
 def host_database_url() -> str:
     load_dotenv(ENV_PATH)
-    explicit_host_url = os.getenv("HOST_DATABASE_URL", "").strip()
-    if explicit_host_url:
-        return explicit_host_url
-
     container_url = os.getenv("DATABASE_URL", "").strip()
     if container_url:
         return container_url.replace("host.docker.internal", "127.0.0.1")

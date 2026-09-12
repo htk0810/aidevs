@@ -83,7 +83,7 @@ http://backend:8000
 
 ## 5. LLM Provider 설정 오류
 
-기본 Compose에서 Ollama를 선택했다면 기존 공용 Ollama와 `.env`의
+기본 Compose에서 Ollama를 선택했다면 기존 공용 Ollama와 `backend/.env`의
 `OLLAMA_ENABLED=true`, `OLLAMA_BASE_URL=http://host.docker.internal:11434`를 확인합니다.
 
 Full Stack 방식에서만 `--profile ollama`와 Model 다운로드를 확인합니다.

@@ -60,7 +60,7 @@ REDIS_URL
 ```
 
 Full Stack Compose는 Backend 주소를 내부 Service 이름으로 명시적으로 바꾸므로 같은
-`.env`를 사용해도 Host 주소와 혼동하지 않습니다.
+`backend/.env`를 사용해도 Host 주소와 혼동하지 않습니다.
 
 ## init.sql 실행 시점
 
