@@ -16,7 +16,7 @@ services:
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-false}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
-      GEMMA_MODEL: ${GEMMA_MODEL:-gemma3:4b}
+      GEMMA_MODEL: ${GEMMA_MODEL:-gemma3:4b}11
     ports:
       - "8000:8000"
     extra_hosts:

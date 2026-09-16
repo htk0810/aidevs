@@ -1,13 +1,13 @@
-name: 07 Simple Compose CI
+name: 07 runtime CI
 
 on:
   push:
     paths:
-      - "07_multi-agent-service-ops/00_service_ops/01_simple-compose/**"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose/**"
       - ".github/workflows/07-simple-compose-ci.yml"
   pull_request:
     paths:
-      - "07_multi-agent-service-ops/00_service_ops/01_simple-compose/**"
+      - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose/**"
       - ".github/workflows/07-simple-compose-ci.yml"
   workflow_dispatch:
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: 07_multi-agent-service-ops/00_service_ops/01_simple-compose
+        working-directory: 07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose
 
     steps:
       - name: Checkout
@@ -43,4 +43,3 @@ jobs:
 
       - name: Build frontend and backend images
         run: docker compose build
-
