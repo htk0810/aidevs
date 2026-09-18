@@ -17,6 +17,8 @@ class NoteRequest(BaseModel):
     message: str = Field(min_length=1, max_length=500)
 
 
+
+
 class ChatRequest(BaseModel):
     session_id: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9_-]+$")
     message: str = Field(min_length=1, max_length=2000)
