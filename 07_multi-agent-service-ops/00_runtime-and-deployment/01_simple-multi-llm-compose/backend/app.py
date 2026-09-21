@@ -153,12 +153,14 @@ def chat(payload: ChatRequest, redis_store: RedisDep, database: DatabaseDep, llm
     }
 
 
+
 @app.get("/api/chat/{session_id}")
 def get_chat_history(session_id: str, database: DatabaseDep) -> dict:
     try:
         return {"session_id": session_id, "messages": database.list_chat(session_id)}
     except Exception as error:
         raise HTTPException(status_code=503, detail=f"PostgreSQL 연결 실패: {error}") from error
+
 
 
 @app.delete("/api/sessions/{session_id}")
