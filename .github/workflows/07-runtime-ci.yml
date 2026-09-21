@@ -2,6 +2,8 @@ name: 07 runtime CI
 
 on:
   push:
+    barnches:
+      - main
     paths:
       - "07_multi-agent-service-ops/00_runtime-and-deployment/01_simple-multi-llm-compose/**"
       - ".github/workflows/07-simple-compose-ci.yml"
