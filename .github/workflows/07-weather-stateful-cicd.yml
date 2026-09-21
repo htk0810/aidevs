@@ -2,6 +2,8 @@ name: 07 Stateful Weather CI CD
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "07_multi-agent-service-ops/00_runtime-and-deployment/06_weather-mcp-stateful-deployment/backend/**"
       - "07_multi-agent-service-ops/00_runtime-and-deployment/06_weather-mcp-stateful-deployment/frontend/**"
