@@ -55,9 +55,11 @@ def generate_answer(provider: str, weather: dict) -> tuple[str, str]:
     response = client.models.generate_content(model=model, contents=prompt)
     return response.text or "응답 내용이 없습니다.", model
 
+
 @app.get("/health/live")
 def live() -> dict:
     return {"status": "ok", "service": "backend"}
+
 
 @app.get("/health/ready")
 async def ready() -> dict:
