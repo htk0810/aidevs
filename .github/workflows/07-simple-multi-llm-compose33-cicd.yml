@@ -114,7 +114,7 @@ jobs:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
         run: |
-          ssh "$AWS_USER@$AWS_HOST" 'cd ~/simple-multi-llm/backend && test -f .env && test -f .env.docker && export BACKEND_IMAGE=simple-multi-llm-backend:latest && docker compose -f compose.yml config --quiet && docker compose -f compose.yml up -d --build --force-recreate && backend_port="$(docker compose -f compose.yml port backend 8000 | head -n 1 | sed "s/.*://")" && test -n "$backend_port" && curl --fail --retry 18 --retry-delay 5 "http://127.0.0.1:${backend_port}/health/ready"'
+          ssh "$AWS_USER@$AWS_HOST" 'cd ~/simple-multi-llm/backend && test -f .env && test -f .env.docker && export BACKEND_IMAGE=simple-multi-llm-backend:latest && docker compose -f compose.yml config --quiet && docker compose -f compose.yml up -d --build --force-recreate && backend_port="$(docker compose -f compose.yml port backend 8000 | head -n 1 | sed "s/.*://")" && test -n "$backend_port" && curl --fail --retry 24 --retry-delay 5 --retry-all-errors "http://127.0.0.1:${backend_port}/health/ready"'
 
       - name: Copy frontend source
         env:
@@ -129,4 +129,4 @@ jobs:
           AWS_HOST: ${{ secrets.AWS_HOST }}
           AWS_USER: ${{ secrets.AWS_USER }}
         run: |
-          ssh "$AWS_USER@$AWS_HOST" 'cd ~/simple-multi-llm/frontend && test -f .env && test -f .env.docker && export FRONTEND_IMAGE=simple-multi-llm-frontend:latest && docker compose -f compose.yml config --quiet && docker compose -f compose.yml up -d --build --force-recreate && frontend_port="$(docker compose -f compose.yml port frontend 8501 | head -n 1 | sed "s/.*://")" && test -n "$frontend_port" && curl --fail --retry 18 --retry-delay 5 "http://127.0.0.1:${frontend_port}/_stcore/health"'
+          ssh "$AWS_USER@$AWS_HOST" 'cd ~/simple-multi-llm/frontend && test -f .env && test -f .env.docker && export FRONTEND_IMAGE=simple-multi-llm-frontend:latest && docker compose -f compose.yml config --quiet && docker compose -f compose.yml up -d --build --force-recreate && frontend_port="$(docker compose -f compose.yml port frontend 8501 | head -n 1 | sed "s/.*://")" && test -n "$frontend_port" && curl --fail --retry 24 --retry-delay 5 --retry-all-errors "http://127.0.0.1:${frontend_port}/_stcore/health"'
