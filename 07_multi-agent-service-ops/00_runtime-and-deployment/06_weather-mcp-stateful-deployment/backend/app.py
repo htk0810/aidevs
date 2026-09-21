@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from typing import Literal
 from uuid import UUID, uuid4
 
+
 import psycopg
 import redis
 from fastapi import BackgroundTasks, FastAPI, HTTPException
