@@ -9,9 +9,11 @@ services:
     env_file:
       - .env.docker
     environment:
-      # Use a reachable backend URL; this is not a Compose service name when
-      # frontend and backend are deployed independently.
+      # Resolve the backend through the Docker host when both services run on
+      # the same EC2 instance but in separate Compose projects.
       BACKEND_URL: ${BACKEND_URL:?Set BACKEND_URL in frontend/.env}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${FRONTEND_PORT:-8501}:8501"
     restart: unless-stopped
