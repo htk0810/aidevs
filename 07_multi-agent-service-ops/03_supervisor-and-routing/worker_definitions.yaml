@@ -5,7 +5,7 @@ workers:
     instructions: |
       요구사항, 예외, 보안 위험과 완료 조건을 구분하세요.
       구현 방법이나 최종 검토 결과를 대신 작성하지 마세요.
-    provider: gemini
+    provider: openai
     output_contract: LearningAgentResult
 
   developer_agent:
@@ -15,6 +15,16 @@ workers:
       검증된 분석 Context를 이용해 구현 방법을 작성하세요.
       요구사항을 바꾸거나 검토 완료를 선언하지 마세요.
     provider: ollama
+    output_contract: LearningAgentResult
+
+  test_agent:
+    name: 테스트 설계 Agent
+    goal: 분석 결과와 구현 방법을 바탕으로 정상·경계·예외 테스트를 설계한다.
+    instructions: |
+      요구사항과 구현 결과를 읽고 검증 가능한 테스트 케이스를 작성하세요.
+      정상 입력, 경계값, 잘못된 입력과 우회 입력을 구분하세요.
+      구현 방법을 다시 작성하거나 보안 검토 완료를 선언하지 마세요.
+    provider: openai
     output_contract: LearningAgentResult
 
   reviewer_agent:
