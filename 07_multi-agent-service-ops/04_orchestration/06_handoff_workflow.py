@@ -19,7 +19,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from shared.travel_contracts import HandoffDecision
+from shared.travel_contracts import SupportAgentResult
 from shared.travel_llm import provider_for_agent, run_learning_agent, run_with_metadata
 
 
@@ -48,8 +48,8 @@ def support_agent(message: str) -> dict:
 배송 지연 문의에서 환불 조건 확인이 필요하면 refund_agent로 Handoff하세요.
 handoff_context에는 order_id와 issue만 넣고 비밀번호·Token·전체 대화는 넣지 마세요.
 요청: {message}
-HandoffDecision 계약으로 반환하세요."""
-    return run_with_metadata(provider_for_agent("support_agent"), prompt, HandoffDecision)
+SupportAgentResult 계약으로 반환하세요."""
+    return run_with_metadata(provider_for_agent("support_agent"), prompt, SupportAgentResult)
 
 
 def refund_agent(message: str, handoff: SupportHandoff) -> dict:
@@ -61,6 +61,7 @@ if __name__ == "__main__":
     decision = support_agent(request)
     print("=== Support Agent 결정 ===")
     print(json.dumps(decision, ensure_ascii=False, indent=2))
+    
     if decision["result"] is None:
         print("Support Agent 오류로 Handoff를 실행하지 않습니다.")
     elif not decision["result"]["handoff_required"]:
@@ -68,11 +69,8 @@ if __name__ == "__main__":
     else:
         if decision["result"]["target_agent"] != "refund_agent":
             raise ValueError("Support Agent가 허용되지 않은 Handoff 대상을 선택했습니다.")
-        allowed_context_keys = {"order_id", "issue"}
-        proposed_context = decision["result"]["handoff_context"]
-        safe_context = {key: value for key, value in proposed_context.items() if key in allowed_context_keys}
-        safe_context.setdefault("order_id", "ORDER-102")
-        safe_context.setdefault("issue", "배송이 일주일 지연됨")
+        # 두 값은 계약에서 필수 검증되었습니다. 누락된 Context를 성공 데이터로 채우지 않습니다.
+        safe_context = decision["result"]["handoff_context"]
         handoff = SupportHandoff(
             task_id="support-001",
             trace_id="trace-001",

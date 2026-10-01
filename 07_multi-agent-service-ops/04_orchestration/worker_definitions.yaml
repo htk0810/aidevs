@@ -2,7 +2,7 @@ workers:
   weather_agent:
     name: 날씨 분석 Agent
     goal: 여행 기간의 날씨 위험과 준비 사항을 정리한다.
-    provider: gemini
+    provider: openai
     output_contract: WeatherResult
   place_agent:
     name: 장소 검색 Agent

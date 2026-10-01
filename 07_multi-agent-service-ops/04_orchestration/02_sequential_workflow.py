@@ -32,7 +32,7 @@ def sequential_orchestrator_agent(request: str) -> dict[str, object]:
         if response["error"]:
             return {"status": "failed", "reason": f"{agent_id}_failed", "results": results, "trace": trace}
         results[agent_id] = response["result"]
-        context = response["result"]
+    context = [response["result"]] if context is None else context + [response["result"]]
     return {"status": "completed", "reason": "all_steps_completed", "results": results, "trace": trace}
 
 

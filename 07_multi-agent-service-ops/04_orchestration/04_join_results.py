@@ -42,6 +42,7 @@ def itinerary_agent(joined_context: dict[str, object]) -> dict:
 
 
 if __name__ == "__main__":
+    # 3개의 Agent가 병렬도 동작하고 결과를 모두 검증(출력계약)한 뒤 
     joined = join_guard_agent(VERIFIED_RESULTS)
     print("Join된 Agent:", list(joined))
     result = itinerary_agent(joined)
