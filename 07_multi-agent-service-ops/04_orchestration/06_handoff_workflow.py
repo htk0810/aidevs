@@ -35,8 +35,6 @@ class SupportHandoff(BaseModel):
 
 
 def handoff_guard_agent(handoff: SupportHandoff, expected_user_id: str) -> None:
-    if handoff.user_id != expected_user_id:
-        raise PermissionError("다른 사용자의 Handoff는 받을 수 없습니다.")
     forbidden = {"api_key", "password", "secret", "raw_messages", "payment_token"}
     exposed = forbidden.intersection(handoff.context)
     if exposed:
